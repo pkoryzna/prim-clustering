@@ -24,14 +24,30 @@ object PartitionedMatrix{
 
 
 case class UndirectedGraph(dim: Int, matrix: Vector[Vector[Double]]) {
-  def reachableFrom(vertex: Int): Seq[(Double, Int)] = {
-    matrix(vertex).zipWithIndex.collect {
-      case (weight, idx) if weight != Edge.UNREACHABLE => (weight, idx)
+
+  /**
+   * @param from from which we are going out 
+   * @return vertices that can be reached from given vertex with their respective weights 
+   */
+  def reachableFrom(from: Int): Seq[(Int, Double)] = {
+    matrix(from).zipWithIndex.collect {
+      case (weight, vertex) if weight != Edge.UNREACHABLE => (vertex, weight)
     }
   }
 
-  def weight(from: Int, to: Int): Double = matrix(from)(to)
+  /**
+   * @return vertices which have at least one edge connecting them
+   */
+  def vertices: Set[Int] = matrix.zipWithIndex.filterNot(_._1.forall(_ == Edge.UNREACHABLE)).collect {case (_, idx) => idx}.toSet
 
+  /**
+   * @return weight of an edge connecting vertices a and b
+   */
+  def weight(a: Int, b: Int): Double = matrix(a)(b)
+
+  /**
+   * @return adds edge to graph returning a new copy
+   */
   def +(edge: Edge): UndirectedGraph = edge match {
     case Edge(from, to, weight) => {
       val upd: Vector[Vector[Double]] = matrix.updated(from, matrix(from).updated(to, weight))

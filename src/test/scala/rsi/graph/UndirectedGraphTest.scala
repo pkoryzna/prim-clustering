@@ -31,6 +31,20 @@ class UndirectedGraphTest extends org.specs2.mutable.Specification with ScalaChe
       (graph + newEdge).weight(newEdge.to, newEdge.from) must beEqualTo(newEdge.weight)
 
     }
+
+    "be able to return all its reachable vertices" in {
+      "simple case" >> {
+        val graph = UndirectedGraph(2, Edge(0, 1, 9999.9))
+        graph.vertices should beEqualTo(Set(0, 1))
+      }
+
+      "harder case" >> {
+        val graph = UndirectedGraph(3, Edge(0, 1, 1))
+        graph.vertices should beEqualTo(Set(0, 1))
+      }
+
+
+    }
   }
 
   "PartitionedMatrix" should {
