@@ -32,6 +32,14 @@ case class UndirectedGraph(dim: Int, matrix: Vector[Vector[Double]]) {
 
   def weight(from: Int, to: Int): Double = matrix(from)(to)
 
+  def +(edge: Edge): UndirectedGraph = edge match {
+    case Edge(from, to, weight) => {
+      val upd: Vector[Vector[Double]] = matrix.updated(from, matrix(from).updated(to, weight))
+      val `'upd`: Vector[Vector[Double]] = upd.updated(to, matrix(to).updated(from, weight))
+
+      this.copy(matrix = `'upd`)
+    }
+  }
 
   /**
    * Split the adjacency matrix.

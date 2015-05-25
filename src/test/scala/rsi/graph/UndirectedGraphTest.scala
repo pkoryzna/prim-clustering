@@ -22,6 +22,15 @@ class UndirectedGraphTest extends org.specs2.mutable.Specification with ScalaChe
         graph.matrix(from)(to) shouldEqual (graph.matrix(to)(from))
       }
     }
+
+    "support adding new edges to the graph" in {
+      val newEdge = Edge(5,6,999.0)
+
+      (graph + newEdge).weight(newEdge.from, newEdge.to) must beEqualTo(newEdge.weight)
+
+      (graph + newEdge).weight(newEdge.to, newEdge.from) must beEqualTo(newEdge.weight)
+
+    }
   }
 
   "PartitionedMatrix" should {
