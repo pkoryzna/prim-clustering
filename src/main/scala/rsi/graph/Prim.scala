@@ -12,17 +12,17 @@ object Prim {
   }
 
   @tailrec
-  private def mst(inputGraph: UndirectedGraph, partial: UndirectedGraph, vertices: Set[Int]): UndirectedGraph = {
-    if (partial.vertices == vertices) partial
+  private def mst(inputGraph: UndirectedGraph, currentPartial: UndirectedGraph, vertices: Set[Int]): UndirectedGraph = {
+    if (currentPartial.vertices == vertices) currentPartial
     else {
       // get all edges connected to vertices of partial mst
-      val reachable: Set[Edge] = partial.vertices.flatMap(inputGraph.edges)
+      val reachable: Set[Edge] = currentPartial.vertices.flatMap(inputGraph.edges)
       // filter edges to vertices already in partial mst
-      val candidates: Set[Edge] = reachable.filterNot { case Edge(from, to, _) => partial.matrix(from)(to) != Edge.UNREACHABLE }
+      val candidates: Set[Edge] = reachable.filterNot { case Edge(from, to, _) => currentPartial.matrix(from)(to) != Edge.UNREACHABLE }
       // add the cheapest to partial mst and recur
       val cheapest: Edge = candidates.minBy(_.weight)
 
-      mst(inputGraph, partial + cheapest, vertices)
+      mst(inputGraph, currentPartial + cheapest, vertices)
     }
   }
 }
