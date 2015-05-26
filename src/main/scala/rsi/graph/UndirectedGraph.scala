@@ -11,7 +11,13 @@ object Edge {
 }
 
 case class PartitionedMatrix(vector: Vector[Vector[Double]], offset: Int) {
-  def apply(n: Int): Vector[Double] = vector(n+offset)
+  def apply(n: Int): Vector[Double] = vector(n-offset)
+
+  def reachableFrom(from: Int): Seq[(Int, Double)] = {
+    vector(from - offset).zipWithIndex.collect {
+      case (weight, vertex) if weight != Edge.UNREACHABLE => (vertex, weight)
+    }
+  }
 }
 
 object PartitionedMatrix{
@@ -29,9 +35,9 @@ case class UndirectedGraph(dim: Int, matrix: Vector[Vector[Double]]) {
    * @param from from which we are going out 
    * @return vertices that can be reached from given vertex with their respective weights 
    */
-  def reachableFrom(from: Int): Seq[(Int, Double)] = {
+  def edges(from: Int): Seq[Edge] = {
     matrix(from).zipWithIndex.collect {
-      case (weight, vertex) if weight != Edge.UNREACHABLE => (vertex, weight)
+      case (weight, vertex) if weight != Edge.UNREACHABLE => Edge(from, vertex, weight)
     }
   }
 
@@ -54,6 +60,12 @@ case class UndirectedGraph(dim: Int, matrix: Vector[Vector[Double]]) {
       val `'upd`: Vector[Vector[Double]] = upd.updated(to, matrix(to).updated(from, weight))
 
       this.copy(matrix = `'upd`)
+    }
+  }
+
+  def -(edge: Edge): UndirectedGraph = edge match {
+    case Edge(from, to, _) => { // hax xD
+      this + Edge(from, to, Edge.UNREACHABLE)
     }
   }
 
