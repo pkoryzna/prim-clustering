@@ -71,7 +71,19 @@ class UndirectedGraphTest extends org.specs2.mutable.Specification with ScalaChe
 
         mergedBack must beEqualTo(graph.matrix)
       }
+    }
 
+    "properly remap coords" in {
+      val graph = UndirectedGraph(4, List(Edge(0,1, 0.1), Edge(1,2, 1.2), Edge(2,3, 2.3), Edge(3,0, 3.0)))
+      val partitioned = graph.partition(2)
+
+      partitioned(0)(0)(1) must beEqualTo(graph.weight(0, 1))
+      partitioned(0)(1)(2) must beEqualTo(graph.weight(1, 2))
+      partitioned(1)(2)(3) must beEqualTo(graph.weight(2, 3))
+      partitioned(1)(3)(0) must beEqualTo(graph.weight(3, 0))
+
+      partitioned(1)(0)(3) must beEqualTo(graph.weight(0, 3)) should throwA[IllegalArgumentException]
+      partitioned(0)(3)(0) must beEqualTo(graph.weight(0, 3)) should throwA[IllegalArgumentException]
     }
   }
 }

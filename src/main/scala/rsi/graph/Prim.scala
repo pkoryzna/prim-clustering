@@ -8,12 +8,12 @@ object Prim {
     val vertex = input.vertices.head
     val cheapestEdge = input.edges(vertex).minBy(_.weight)
 
-    mst(input, UndirectedGraph(input.dim, cheapestEdge))
+    mst(input, UndirectedGraph(input.dim, cheapestEdge), input.vertices)
   }
 
   @tailrec
-  private def mst(inputGraph: UndirectedGraph, partial: UndirectedGraph): UndirectedGraph = {
-    if (partial.vertices == inputGraph.vertices) partial
+  private def mst(inputGraph: UndirectedGraph, partial: UndirectedGraph, vertices: Set[Int]): UndirectedGraph = {
+    if (partial.vertices == vertices) partial
     else {
       // get all edges connected to vertices of partial mst
       val edgesLeft = partial.vertices.flatMap(inputGraph.edges)
@@ -22,7 +22,7 @@ object Prim {
       // add the cheapest to partial mst and recur
       val cheapest = candidates.minBy(_.weight)
 
-      mst(inputGraph, partial + cheapest)
+      mst(inputGraph, partial + cheapest, vertices)
     }
   }
 }

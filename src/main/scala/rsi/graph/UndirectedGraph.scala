@@ -11,8 +11,13 @@ object Edge {
 }
 
 case class PartitionedMatrix(vector: Vector[Vector[Double]], offset: Int) {
-  def apply(n: Int): Vector[Double] = vector(n-offset)
+  def apply(n: Int): Vector[Double] = {
+    require(range.contains(n), s"Index $n out of range of this partition: $range")
+    vector(n-offset)
+  }
 
+
+  val range: Range.Inclusive = offset to (offset + vector.size - 1)
   def reachableFrom(from: Int): Seq[(Int, Double)] = {
     vector(from - offset).zipWithIndex.collect {
       case (weight, vertex) if weight != Edge.UNREACHABLE => (vertex, weight)
@@ -20,7 +25,7 @@ case class PartitionedMatrix(vector: Vector[Vector[Double]], offset: Int) {
   }
 }
 
-object PartitionedMatrix{
+object PartitionedMatrix {
   def merge(partitions: Vector[PartitionedMatrix]): Vector[Vector[Double]] = {
     partitions.foldLeft(Vector[Vector[Double]]()) { case (res, partition) =>
       res ++ partition.vector
