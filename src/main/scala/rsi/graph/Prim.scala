@@ -16,9 +16,9 @@ object Prim {
     if (partial.vertices == vertices) partial
     else {
       // get all edges connected to vertices of partial mst
-      val edgesLeft: Set[Edge] = partial.vertices.flatMap(inputGraph.edges)
+      val reachable: Set[Edge] = partial.vertices.flatMap(inputGraph.edges)
       // filter edges to vertices already in partial mst
-      val candidates: Set[Edge] = edgesLeft.filterNot { case Edge(from, to, _) => partial.matrix(from)(to) != Edge.UNREACHABLE }
+      val candidates: Set[Edge] = reachable.filterNot { case Edge(from, to, _) => partial.matrix(from)(to) != Edge.UNREACHABLE }
       // add the cheapest to partial mst and recur
       val cheapest: Edge = candidates.minBy(_.weight)
 
