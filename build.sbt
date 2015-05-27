@@ -18,3 +18,8 @@ scalacOptions in Test ++= Seq(
 libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.12.3" % "test"
 
 libraryDependencies += "org.specs2" %% "specs2-scalacheck" % "3.6"
+
+libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.3.11"
+
+libraryDependencies += "com.typesafe.akka" %% "akka-cluster" % "2.3.11"
+
