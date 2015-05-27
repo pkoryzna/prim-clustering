@@ -27,6 +27,20 @@ object Prim {
       mst(matrix, fromVertices + cheapestEdge.to + cheapestEdge.from, currentPartial + cheapestEdge, allVertices)
     }
   }
+  
+  def cheapestInPartition(matrix: PartitionedMatrix, currentPartial: UndirectedGraph, allVertices: Set[Int]): Option[Edge] = {
+    // get all edges connected to vertices of partial mst within current partition
+    val reachable: Set[Edge] = findReachable(matrix.range.intersect(currentPartial.vertices.toSeq), matrix(_))
+    // filter edges to vertices already in partial mst
+    val candidates: Set[Edge] = notInCurrentMST(reachable, currentPartial)
+    // return the optional cheapest candidate
+    cheapest(candidates)
+  }
+
+  // add the cheapest edge from those obtained from partitions to partial mst graph
+  def partialFromPartitions(cheapestEdges: List[Option[Edge]], currentPartial: UndirectedGraph) : UndirectedGraph = {
+    currentPartial + cheapestEdges.flatten.minBy(_.weight)
+  }
 
   def findReachable(fromVertices: Seq[Int], matrix: Int => Vector[Double]): Set[Edge] = {
     fromVertices.flatMap(from => {
