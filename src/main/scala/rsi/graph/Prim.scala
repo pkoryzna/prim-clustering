@@ -10,29 +10,26 @@ object Prim {
     val vertex = input.vertices.head
     val cheapestEdge = input.edges(vertex).minBy(_.weight)
 
-    mst(input, UndirectedGraph(input.dim, cheapestEdge), input.vertices)
+    mst(input.matrix, input.vertices, UndirectedGraph(input.dim, cheapestEdge), input.vertices)
   }
 
   @tailrec
-  private def mst(inputGraph: UndirectedGraph, currentPartial: UndirectedGraph, vertices: Set[Int]): UndirectedGraph = {
-    if (currentPartial.vertices == vertices) currentPartial
+  private def mst(matrix: Matrix, fromVertices: Set[Int], currentPartial: UndirectedGraph, allVertices: Set[Int]): UndirectedGraph = {
+    if (currentPartial.vertices == allVertices) currentPartial
     else {
-      val verticesToSearch: Set[Int] = currentPartial.vertices
-      val matrix: Matrix = inputGraph.matrix
-
       // get all edges connected to vertices of partial mst
-      val reachable: Set[Edge] = findReachable(verticesToSearch.toSeq, matrix)
+      val reachable: Set[Edge] = findReachable(fromVertices.toSeq, matrix)
       // filter edges to vertices already in partial mst
       val candidates: Set[Edge] = notInCurrentMST(reachable, currentPartial)
       // add the cheapest to partial mst and recur
       val cheapestEdge: Edge = cheapest(candidates)
 
-      mst(inputGraph, currentPartial + cheapestEdge, vertices)
+      mst(matrix, fromVertices + cheapestEdge.to + cheapestEdge.from, currentPartial + cheapestEdge, allVertices)
     }
   }
 
-  def findReachable(verticesToSearch: Seq[Int], matrix: Int => Vector[Double]): Set[Edge] = {
-    verticesToSearch.flatMap(from => {
+  def findReachable(fromVertices: Seq[Int], matrix: Int => Vector[Double]): Set[Edge] = {
+    fromVertices.flatMap(from => {
       matrix(from).zipWithIndex.collect {
         case (weight, to) if weight != Edge.UNREACHABLE => Edge(from, to, weight)
       }

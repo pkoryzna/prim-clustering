@@ -31,12 +31,12 @@ class PrimTest extends Specification {
       }
 
       "harder graph" >> {
-        val graph = UndirectedGraph(5, Edge(0, 1, 1.0),
+        val graph = UndirectedGraph(5, Edge(0, 1, 0.1),
           Edge(0, 2, 9999.0), Edge(0, 3, 8888.0),
-          Edge(1, 4, 1.0), Edge(2, 4, 1.0), Edge(3, 4, 1.0)
+          Edge(1, 4, 1.4), Edge(2, 4, 2.4), Edge(3, 4, 3.4)
         )
 
-        Prim.mst(graph) must beEqualTo(UndirectedGraph(5, Edge(0, 1, 1.0), Edge(1, 4, 1.0), Edge(2, 4, 1.0), Edge(3, 4, 1.0)
+        Prim.mst(graph) must beEqualTo(UndirectedGraph(5, Edge(0, 1, 0.1), Edge(1, 4, 1.4), Edge(2, 4, 2.4), Edge(3, 4, 3.4)
         ))
       }
 

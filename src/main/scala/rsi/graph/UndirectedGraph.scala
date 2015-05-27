@@ -1,5 +1,6 @@
 package rsi.graph
 
+import scala.StringBuilder
 import scala.language.implicitConversions
 
 
@@ -85,6 +86,7 @@ case class UndirectedGraph(dim: Int, matrix: Vector[Vector[Double]]) {
 
     Vector.tabulate(partitionCount){n => PartitionedMatrix(matrix.slice(n*partitionSize, (n+1)*partitionSize), n*partitionSize)}
   }
+
 }
 
 
