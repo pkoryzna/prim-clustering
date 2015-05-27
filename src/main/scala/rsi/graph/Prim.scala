@@ -22,7 +22,7 @@ object Prim {
       // filter edges to vertices already in partial mst
       val candidates: Set[Edge] = notInCurrentMST(reachable, currentPartial)
       // add the cheapest to partial mst and recur
-      val cheapestEdge: Edge = cheapest(candidates)
+      val cheapestEdge: Edge = cheapest(candidates).get
 
       mst(matrix, fromVertices + cheapestEdge.to + cheapestEdge.from, currentPartial + cheapestEdge, allVertices)
     }
@@ -40,7 +40,8 @@ object Prim {
     reachable.filterNot { case Edge(from, to, _) => partial.matrix(from)(to) != Edge.UNREACHABLE }
   }
 
-  def cheapest(candidates: Set[Edge]): Edge = {
-    candidates.minBy(_.weight)
+  def cheapest(candidates: Set[Edge]): Option[Edge] = {
+    if(candidates.isEmpty) None
+    else Some(candidates.minBy(_.weight))
   }
 }
