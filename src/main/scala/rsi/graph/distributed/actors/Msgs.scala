@@ -10,4 +10,5 @@ object Msgs {
   case class JobFailed(reason: String, job: FindMst)
   case object BackendRegistration
 
+  case class SetUp(workerCount: Int)
 }

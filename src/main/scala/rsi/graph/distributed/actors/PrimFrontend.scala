@@ -16,10 +16,11 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 //#frontend
-class PrimFrontend extends Actor {
+class PrimFrontend extends Actor with ActorLogging {
   implicit val timeout = Timeout(5 seconds)
   implicit val futureCtx = scala.concurrent.ExecutionContext.fromExecutor(Executors.newCachedThreadPool())
   var backends = IndexedSeq.empty[ActorRef]
+  var maxWorkers = Int.MaxValue
 
   def receive = LoggingReceive {
     case job: FindMst if backends.isEmpty =>
@@ -28,6 +29,7 @@ class PrimFrontend extends Actor {
     case BackendRegistration if !backends.contains(sender()) =>
       context watch sender()
       backends = backends :+ sender()
+      log.info(s"${backends.size} workers joined")
 
     case Terminated(a) =>
       backends = backends.filterNot(_ == a)
@@ -53,6 +55,9 @@ class PrimFrontend extends Actor {
     case FindMst(graph, Some(solution), Some(origSender)) if solution.vertices == graph.vertices =>
       origSender ! solution
 
+    case SetUp(count) =>
+      log.info(s"Setting max worker count to $count")
+      maxWorkers = count
 
   }
 }
@@ -78,16 +83,26 @@ object PrimFrontend {
       Edge(1, 4, 1.4), Edge(2, 4, 2.4), Edge(3, 4, 3.4)
     )
 
-    def makeReq(): Unit =
-    system.scheduler.scheduleOnce(10.seconds) {
+    def makeReq(workerCount: Int, startTime:Long = System.currentTimeMillis()): Future[Any] =
+    {
       implicit val timeout = Timeout(5 seconds)
 
-      frontend ? FindMst(graph) onSuccess {
-        case jf: JobFailed => println(jf); makeReq()
-        case res => println("\n\n\n\nRESULT: " + res)
+      frontend ! SetUp(workerCount)
+      val future = frontend ? FindMst(graph)
+      future onSuccess {
+        case jf: JobFailed => println(jf);
+        case res => println(s"\t$workerCount workers enabled, got result in: ${Duration(System.currentTimeMillis() - startTime, MILLISECONDS)}")
       }
+
+      future
     }
-    makeReq()
+
+    system.scheduler.schedule(20 seconds, 10 seconds) {
+      makeReq(1).onSuccess{ case _ =>
+        makeReq(2).onSuccess{case _ =>
+            makeReq(4)
+      }}}
+
 
   }
 
